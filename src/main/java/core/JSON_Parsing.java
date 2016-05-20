@@ -1,11 +1,15 @@
 package core;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Properties;
 
 import javax.json.Json;
 import javax.json.stream.JsonParser;
@@ -15,10 +19,15 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 
+//import org.openqa.selenium.htmlunit.HtmlUnitDriver;
+//import com.gargoylesoftware.htmlunit.BrowserVersion;
+
+
+
 public class JSON_Parsing 
 {
  
-	
+
 	public static String url_item_1 = "http://www.amazon.com/Mountaintop-Outdoor-Waterproof-Climbing-Backpacks/dp/B00ZHIHQD4/ref=sr_1_99?s=outdoor-recreation&ie=UTF8&qid=1463525377&sr=1-99-spons&psc=1";    	
 	public static String url_item_2 = "http://www.amazon.com/Ohuhu-Degree-Camping-Sleeping-Carrying/dp/B015DVHSOQ/ref=lp_2204498011_1_23?s=outdoor-recreation&ie=UTF8&qid=1463543339&sr=1-23";
 	public static String url_item_3 = "http://www.amazon.com/gp/product/B014SCC3GO/ref=s9_zgift_hd_bw_bEKyT_g468_i2?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=merchandised-search-9&pf_rd_r=1HED11DEPBWDRDJGTQDV&pf_rd_t=101&pf_rd_p=8367108d-16d3-5b14-b340-5115b1de99d0&pf_rd_i=3417221";
@@ -30,64 +39,78 @@ public class JSON_Parsing
 	public static  String item_03_name = "Salomon Womens Cross Country Skis";
 	public static  String item_04_name = "Trango Polarized Sunglasses";
 	public static  String item_05_name = "Nikon Coolpix L330 Digital Camera ";
-    
-    
-	public static  String item_1xpath = "//span[@id='priceblock_ourprice']";
+		
+	public static String item_1xpath = null;	
+ 	public static String HostName = null;
+	public static String queryHost = null;
+	public static String queryService1 = null;
+	public static String queryService2 = null;
+	public static String UScode = null;	
 	
- 	public static String HostName = "http://www.geoplugin.net/json.gp?ip=";
 	public static final String element_01 = "geoplugin_countryName";
 	public static final String element_02 = "geoplugin_currencyCode";
-
-	public static String queryHost = "http://query.yahooapis.com/v1/public/yql";
-	public static String queryService1 = "?q=select%20*%20from%20yahoo.finance.xchange%20where%20pair%20in%20%28%22";
-	public static String queryService2 = "%22%29&format=json&env=store://datatables.org/alltableswithkeys";	
-	public static String UScode = "USD";
-	
-	
 	public static final String element_03 = "Name";
 	public static final String element_04 = "Rate";
- 
 	
+
+ 	public static String ipAddr_1 =	"88.191.179.56";
+ 	public static String ipAddr_2 = "61.135.248.220";
+ 	public static String ipAddr_3 =	"92.40.254.196";
+ 	public static String ipAddr_4 =	"93.183.203.67";
+ 	public static String ipAddr_5 =	"213.87.141.36";
+	
+
 	public static void main(String[] args) throws IOException {
-	
-		WebDriver driver = new FirefoxDriver();
-		    Double tem_01_usd_price = GetOriginPrice_of_Item(url_item_1, driver, item_1xpath );
-		    Double tem_02_usd_price = GetOriginPrice_of_Item(url_item_2, driver, item_1xpath );
-		    Double tem_03_usd_price = GetOriginPrice_of_Item(url_item_3, driver, item_1xpath );
-		    Double tem_04_usd_price = GetOriginPrice_of_Item(url_item_4, driver, item_1xpath );
-		    Double tem_05_usd_price = GetOriginPrice_of_Item(url_item_5, driver, item_1xpath );	
-		    		 
-		    driver.quit();
+
+
+			Properties property = new Properties();
+			property.load(new FileInputStream("./src/main/resources/DataSource.properties"));
+			
+			item_1xpath = property.getProperty("item_1xpath");		
+			HostName = property.getProperty("HostName");
+			queryHost = property.getProperty("queryHost");
+			queryService1 = property.getProperty("queryService1");
+			queryService2 = property.getProperty("queryService2");
+		    UScode = property.getProperty("UScode");		
+		    
+	    
+     /*
+	    WebDriver driver = new HtmlUnitDriver();
+	    ((HtmlUnitDriver)driver).setJavascriptEnabled(true);
+	    HtmlUnitDriver driver =new HtmlUnitDriver(BrowserVersion.FIREFOX_38);
+	 */    
+	 		WebDriver driver = new FirefoxDriver();
+	 		
+		    Double tem_01_usd_price = GetOriginPrice_of_Item(url_item_1 , driver, item_1xpath );
+		    Double tem_02_usd_price = GetOriginPrice_of_Item(url_item_2 , driver, item_1xpath );
+		    Double tem_03_usd_price = GetOriginPrice_of_Item(url_item_3 , driver, item_1xpath );
+		    Double tem_04_usd_price = GetOriginPrice_of_Item(url_item_4 , driver, item_1xpath );
+		    Double tem_05_usd_price = GetOriginPrice_of_Item(url_item_5 , driver, item_1xpath );	
+			driver.quit();		 
+		
 						
-		Caller caller1 = new Caller(); // for each IP 
-		 caller1.IP = "88.191.179.56";
+		 Caller caller1 = new Caller(); // for each IP 
+		 caller1.IP = ipAddr_1; //from csvFile
 		 ParserResults webResults1 = JSON_Parsing.runParser(HostName, caller1); //runPlugin() returns values into object "webResults1" of class PluginResult
 	//	 System.out.println("Country: " + webResults1.countryName);
 	//	 System.out.println("Currency: " + webResults1.currencyCode);
 		
-	    Caller caller2 = new Caller();
-		 caller2.IP = "61.135.248.220";
+	     Caller caller2 = new Caller();
+		 caller2.IP = ipAddr_2; //from csvFile
 		 ParserResults webResults2 = JSON_Parsing.runParser(HostName, caller2);
-	// System.out.println("Country: " + webResults2.countryName);
-	//	 System.out.println("Currency: " + webResults2.currencyCode);
 		
-		Caller caller3 = new Caller();
-		 caller3.IP = "92.40.254.196";
+		 Caller caller3 = new Caller();
+		 caller3.IP = ipAddr_3; //from csvFile
 		 ParserResults webResults3 = JSON_Parsing.runParser(HostName, caller3);
-	//	 System.out.println("Country: " + webResults3.countryName);
-	//	 System.out.println("Currency: " + webResults3.currencyCode);
 			
 		 Caller caller4 = new Caller();
-		  caller4.IP = "93.183.203.67";
-		  ParserResults webResults4 = JSON_Parsing .runParser(HostName, caller4);
-	//	  System.out.println("Country: " + webResults4.countryName);
-	//	  System.out.println("Currency: " + webResults4.currencyCode);
+		 caller4.IP = ipAddr_4; //from csvFile
+		 ParserResults webResults4 = JSON_Parsing .runParser(HostName, caller4);
 				
-	    Caller caller5 = new Caller();
-		 caller5.IP = "213.87.141.36";
+	     Caller caller5 = new Caller();
+		 caller5.IP = ipAddr_5; //from csvFile
 		 ParserResults webResults5 = JSON_Parsing .runParser(HostName, caller5);
-	//	 System.out.println("Country: " + webResults5.countryName);
-	//	 System.out.println("Currency: " + webResults5.currencyCode);
+
 		
 //Find out currency exchange rate, using following JSON Web Service:
 		Double currancyRate_EUR = rate_Parser(webResults1.currencyCode);
@@ -163,7 +186,8 @@ System.out.println("Item_05: " + item_05_name + "; US Price: " + tem_05_usd_pric
 System.out.println("Item_05: " + item_05_name + "; US Price: " + tem_05_usd_price + "; Country: " + webResults3.countryName + "; Local Price: " + item_05_gbp_price+"_"+webResults3.currencyCode);
 System.out.println("Item_05: " + item_05_name + "; US Price: " + tem_05_usd_price + "; Country: " + webResults4.countryName + "; Local Price: " + item_05_uah_price+"_"+webResults4.currencyCode);
 System.out.println("Item_05: " + item_05_name + "; US Price: " + tem_05_usd_price + "; Country: " + webResults5.countryName + "; Local Price: " + item_05_rub_price+"_"+webResults5.currencyCode);
-  
+
+		
 	
 	} //main method
 
